@@ -1,57 +1,51 @@
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"; // Import Kinde session handler
+import { createUploadthing, type FileRouter } from "uploadthing/next"; // Import UploadThing for file uploads
+import { UploadThingError } from "uploadthing/server"; // Custom error for UploadThing
 
-const f = createUploadthing();
+const f = createUploadthing(); // Initialize UploadThing instance
 
-// FileRouter for your app, can contain multiple FileRoutes
+// Define the FileRouter for managing file uploads
 export const ourFileRouter = {
-  // Define as many FileRoutes as you like, each with a unique routeSlug
+  // Route for uploading multiple images (up to 10)
   imageUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 10 } })
-    // Set permissions and file types for this FileRoute
     .middleware(async ({ req }) => {
       const { getUser } = getKindeServerSession();
       const user = await getUser();
 
-      // If you throw, the user will not be able to upload
+      // Allow upload only if the user is authorized
       if (!user || user.email !== "omarsharief642002@gmail.com")
         throw new UploadThingError("Unauthorized");
 
-      // Whatever is returned here is accessible in onUploadComplete as `metadata`
+      // Return metadata to be available during upload completion
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      // This code RUNS ON YOUR SERVER after upload
+      // Runs after file upload is completed
       console.log("Upload complete for userId:", metadata.userId);
-
       console.log("file url", file.url);
 
-      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      // Data returned here is sent to the client in `onClientUploadComplete`
       return { uploadedBy: metadata.userId };
     }),
 
+  // Route for uploading a single banner image
   bannerImageRoute: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
-    // Set permissions and file types for this FileRoute
     .middleware(async ({ req }) => {
       const { getUser } = getKindeServerSession();
       const user = await getUser();
 
-      // If you throw, the user will not be able to upload
+      // Restrict upload to a specific authorized user
       if (!user || user.email !== "jan@alenix.de")
         throw new UploadThingError("Unauthorized");
 
-      // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      // This code RUNS ON YOUR SERVER after upload
       console.log("Upload complete for userId:", metadata.userId);
-
       console.log("file url", file.url);
 
-      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.userId };
     }),
-} satisfies FileRouter;
+} satisfies FileRouter; // Type-safety check for FileRouter
 
-export type OurFileRouter = typeof ourFileRouter;
+export type OurFileRouter = typeof ourFileRouter; // Export router type for use elsewhere

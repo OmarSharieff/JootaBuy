@@ -1,7 +1,8 @@
-import prisma from "@/app/lib/db";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, PartyPopper, ShoppingBag, User2 } from "lucide-react";
+import prisma from "@/app/lib/db"; // Import Prisma client instance
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // UI card components
+import { DollarSign, PartyPopper, ShoppingBag, User2 } from "lucide-react"; // Icons for cards
 
+// Fetch data from the database: users, products, and orders
 async function getData() {
   const [user, products, order] = await Promise.all([
     prisma.user.findMany({
@@ -9,13 +10,11 @@ async function getData() {
         id: true,
       },
     }),
-
     prisma.product.findMany({
       select: {
         id: true,
       },
     }),
-
     prisma.order.findMany({
       select: {
         amount: true,
@@ -30,14 +29,18 @@ async function getData() {
   };
 }
 
+// DashboardStats component to display key metrics
 export async function DashboardStats() {
-  const { products, user, order } = await getData();
+  const { products, user, order } = await getData(); // Fetch all required data
 
-  const totalAmount = order.reduce((accumalator, currentValue) => {
-    return accumalator + currentValue.amount;
+  // Calculate total revenue by summing up all order amounts
+  const totalAmount = order.reduce((accumulator, currentValue) => {
+    return accumulator + currentValue.amount;
   }, 0);
+
   return (
     <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      {/* Card for Total Revenue */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Total Revenue</CardTitle>
@@ -50,6 +53,8 @@ export async function DashboardStats() {
           <p className="text-xs text-muted-foreground">Based on 100 Charges</p>
         </CardContent>
       </Card>
+
+      {/* Card for Total Sales */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Total Sales</CardTitle>
@@ -62,6 +67,8 @@ export async function DashboardStats() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Card for Total Products */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Total Products</CardTitle>
@@ -74,6 +81,8 @@ export async function DashboardStats() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Card for Total Users */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Total Users</CardTitle>

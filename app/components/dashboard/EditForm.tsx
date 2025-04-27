@@ -34,6 +34,7 @@ import { parseWithZod } from "@conform-to/zod";
 import { productSchema } from "@/app/lib/zodSchemas";
 import { type $Enums } from "@prisma/client";
 
+// Props for EditForm component
 interface iAppProps {
   data: {
     id: string;
@@ -47,26 +48,30 @@ interface iAppProps {
   };
 }
 
+// EditForm component
 export function EditForm({ data }: iAppProps) {
-  const [images, setImages] = useState<string[]>(data.images);
-  const [lastResult, action] = useFormState(editProduct, undefined);
+  const [images, setImages] = useState<string[]>(data.images); // Handle images separately
+  const [lastResult, action] = useFormState(editProduct, undefined); // Form state from server action
   const [form, fields] = useForm({
     lastResult,
-
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: productSchema });
     },
-
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
   });
 
+  // Handle image deletion
   const handleDelete = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
   };
+
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
+      {/* Hidden input for product ID */}
       <input type="hidden" name="productId" value={data.id} />
+
+      {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="outline" size="icon" asChild>
           <Link href="/dashboard/products">
@@ -76,6 +81,7 @@ export function EditForm({ data }: iAppProps) {
         <h1 className="text-xl font-semibold tracking-tight">Edit Product</h1>
       </div>
 
+      {/* Card for form */}
       <Card className="mt-5">
         <CardHeader>
           <CardTitle>Product Details</CardTitle>
@@ -83,8 +89,10 @@ export function EditForm({ data }: iAppProps) {
             In this form you can update your product
           </CardDescription>
         </CardHeader>
+
         <CardContent>
           <div className="flex flex-col gap-6">
+            {/* Product Name */}
             <div className="flex flex-col gap-3">
               <Label>Name</Label>
               <Input
@@ -95,10 +103,10 @@ export function EditForm({ data }: iAppProps) {
                 className="w-full"
                 placeholder="Product Name"
               />
-
               <p className="text-red-500">{fields.name.errors}</p>
             </div>
 
+            {/* Product Description */}
             <div className="flex flex-col gap-3">
               <Label>Description</Label>
               <Textarea
@@ -109,6 +117,8 @@ export function EditForm({ data }: iAppProps) {
               />
               <p className="text-red-500">{fields.description.errors}</p>
             </div>
+
+            {/* Product Price */}
             <div className="flex flex-col gap-3">
               <Label>Price</Label>
               <Input
@@ -121,6 +131,7 @@ export function EditForm({ data }: iAppProps) {
               <p className="text-red-500">{fields.price.errors}</p>
             </div>
 
+            {/* Featured Switch */}
             <div className="flex flex-col gap-3">
               <Label>Featured Product</Label>
               <Switch
@@ -131,6 +142,7 @@ export function EditForm({ data }: iAppProps) {
               <p className="text-red-500">{fields.isFeatured.errors}</p>
             </div>
 
+            {/* Product Status */}
             <div className="flex flex-col gap-3">
               <Label>Status</Label>
               <Select
@@ -150,6 +162,7 @@ export function EditForm({ data }: iAppProps) {
               <p className="text-red-500">{fields.status.errors}</p>
             </div>
 
+            {/* Product Category */}
             <div className="flex flex-col gap-3">
               <Label>Category</Label>
               <Select
@@ -171,6 +184,7 @@ export function EditForm({ data }: iAppProps) {
               <p className="text-red-500">{fields.category.errors}</p>
             </div>
 
+            {/* Images Section */}
             <div className="flex flex-col gap-3">
               <Label>Images</Label>
               <input
@@ -180,6 +194,8 @@ export function EditForm({ data }: iAppProps) {
                 name={fields.images.name}
                 defaultValue={fields.images.initialValue as any}
               />
+
+              {/* Show uploaded images */}
               {images.length > 0 ? (
                 <div className="flex gap-5">
                   {images.map((image, index) => (
@@ -191,7 +207,7 @@ export function EditForm({ data }: iAppProps) {
                         alt="Product Image"
                         className="w-full h-full object-cover rounded-lg border"
                       />
-
+                      {/* Delete button on each image */}
                       <button
                         onClick={() => handleDelete(index)}
                         type="button"
@@ -203,6 +219,7 @@ export function EditForm({ data }: iAppProps) {
                   ))}
                 </div>
               ) : (
+                // If no images, show upload component
                 <UploadDropzone
                   endpoint="imageUploader"
                   onClientUploadComplete={(res) => {
@@ -213,11 +230,12 @@ export function EditForm({ data }: iAppProps) {
                   }}
                 />
               )}
-
               <p className="text-red-500">{fields.images.errors}</p>
             </div>
           </div>
         </CardContent>
+
+        {/* Submit Button */}
         <CardFooter>
           <SubmitButton text="Edit Product" />
         </CardFooter>

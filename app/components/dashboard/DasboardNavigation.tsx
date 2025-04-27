@@ -1,9 +1,10 @@
-"use client";
+"use client"; // Marks this file to run on the client side
 
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils"; // Utility function for conditional classNames
+import Link from "next/link"; // Next.js Link component for client-side navigation
+import { usePathname } from "next/navigation"; // Hook to get the current route pathname
 
+// Array of dashboard navigation links
 const links = [
   {
     name: "Dashboard",
@@ -23,8 +24,10 @@ const links = [
   },
 ];
 
+// Component for rendering dashboard navigation links
 export function DashboardNavigation() {
-  const pathname = usePathname();
+  const pathname = usePathname(); // Get the current path to highlight active link
+
   return (
     <>
       {links.map((link) => (
@@ -33,8 +36,8 @@ export function DashboardNavigation() {
           href={link.href}
           className={cn(
             link.href === pathname
-              ? "text-foreground"
-              : "text-muted-foreground hover:text-foreground"
+              ? "text-foreground" // Active link style
+              : "text-muted-foreground hover:text-foreground" // Inactive link style
           )}
         >
           {link.name}
